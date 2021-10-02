@@ -4,11 +4,18 @@ using Modding;
 using UnityEngine.SceneManagement;
 using USceneManager = UnityEngine.SceneManagement.SceneManager;
 using UObject = UnityEngine.Object;
+using System.Collections.Generic;
 
 namespace PVPArena
 {
-    public class PVPArena : Mod, ITogglableMod
+    public class PVPArena : Mod, IMenuMod, ITogglableMod
     {
+
+        public bool BossEnabled;
+        public bool StandardBossLevel;
+        public int BossLevel;
+
+        public bool ToggleButtonInsideMenu => true;
 
         public static PVPArena Instance { get; private set; }
         
@@ -24,21 +31,63 @@ namespace PVPArena
             
             Unload();
             
-            ModHooks.Instance.AfterSavegameLoadHook += SaveGame;
-            ModHooks.Instance.NewGameHook += AddComponent;
+            ModHooks.AfterSavegameLoadHook += SaveGame;
+            ModHooks.NewGameHook += AddComponent;
             USceneManager.activeSceneChanged += SceneChanged;
+        }
+
+        public List<IMenuMod.MenuEntry> GetMenuData(IMenuMod.MenuEntry? toggleButtonEntry)
+        {
+            IMenuMod.MenuEntry modEnabler = new IMenuMod.MenuEntry {
+                Name = "Enable Mod",
+                Description = "Turn the mod on or off",
+                Values = new string[] {
+                    "Off",
+                    "On"
+                },
+                Saver = toggleButtonEntry.Value.Saver,
+                Loader = toggleButtonEntry.Value.Loader
+            };
+            return new List<IMenuMod.MenuEntry>
+            {
+                modEnabler,
+                new IMenuMod.MenuEntry {
+                    Name = "Enable Bosses",
+                    Description = "Turn on to have invincible bosses in the arenas",
+                    Values = new string[] {
+                        "Off",
+                        "On"
+                    },
+                    Saver = opt => this.BossEnabled = opt == 0,
+                    Loader = () => this.BossEnabled ? 0 : 1
+                },
+                new IMenuMod.MenuEntry {
+                    Name = "Force Boss Level",
+                    Description = "Leave on to force the damage multiplier to the level below",
+                    Values = new string[] {
+                        "On",
+                        "Off"
+                    },
+                    Saver = opt => this.StandardBossLevel = opt == 0,
+                    Loader = () => this.StandardBossLevel ? 0 : 1
+                },
+                new IMenuMod.MenuEntry {
+                    Name = "Boss Level",
+                    Description = "The damage multiplier to be forced",
+                    Values = new string[] {
+                        "Attuned",
+                        "Ascended",
+                        "Radiant"
+                    },
+                    Saver = opt => this.BossLevel = opt,
+                    Loader = () => this.BossLevel
+                }
+            };
         }
 
         private void SceneChanged(Scene arg0, Scene arg1)
         {
             _lastScene = arg0.name;
-        }
-
-        public GlobalModSettings Settings = new GlobalModSettings();
-        public override ModSettings GlobalSettings
-        {
-            get => Settings;
-            set => Settings = (GlobalModSettings) value;
         }
 
         private void SaveGame(SaveGameData data)
@@ -48,11 +97,11 @@ namespace PVPArena
 
         private void AddComponent()
         {
-            if (Settings.StandardBossLevel == false)
+            if (this.StandardBossLevel == false)
             {
                 GameManager.instance.gameObject.AddComponent<SceneLogicLevel>();
             }
-            if (Settings.BossEnabled == true)
+            if (this.BossEnabled == true)
             {
                 GameManager.instance.gameObject.AddComponent<SceneLogicBoss>();
             }
@@ -64,8 +113,8 @@ namespace PVPArena
 
         public void Unload()
         {
-            ModHooks.Instance.AfterSavegameLoadHook -= SaveGame;
-            ModHooks.Instance.NewGameHook -= AddComponent;
+            ModHooks.AfterSavegameLoadHook -= SaveGame;
+            ModHooks.NewGameHook -= AddComponent;
             USceneManager.activeSceneChanged -= SceneChanged;
 
             var finder = GameManager.instance.gameObject.GetComponent<SceneLogic>();
@@ -83,11 +132,5 @@ namespace PVPArena
             if (finder3 != null)
                 UObject.Destroy(finder3);
         }
-    }
-    public class GlobalModSettings : ModSettings
-    {
-        public bool BossEnabled;
-        public bool StandardBossLevel;
-        public int BossLevel;
     }
 }
