@@ -58,7 +58,7 @@ namespace PVPArena
                         "Off",
                         "On"
                     },
-                    Saver = opt => this.BossEnabled = opt == 0,
+                    Saver = opt => this.BossEnabled = opt == 1,
                     Loader = () => this.BossEnabled ? 0 : 1
                 },
                 new IMenuMod.MenuEntry {
@@ -68,7 +68,7 @@ namespace PVPArena
                         "On",
                         "Off"
                     },
-                    Saver = opt => this.StandardBossLevel = opt == 0,
+                    Saver = opt => this.StandardBossLevel = opt == 1,
                     Loader = () => this.StandardBossLevel ? 0 : 1
                 },
                 new IMenuMod.MenuEntry {
