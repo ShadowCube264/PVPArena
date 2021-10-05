@@ -41,10 +41,7 @@ namespace PVPArena
             IMenuMod.MenuEntry modEnabler = new IMenuMod.MenuEntry {
                 Name = "Enable Mod",
                 Description = "Turn the mod on or off",
-                Values = new string[] {
-                    "Off",
-                    "On"
-                },
+                Values = toggleButtonEntry.Value.Values,
                 Saver = toggleButtonEntry.Value.Saver,
                 Loader = toggleButtonEntry.Value.Loader
             };
@@ -68,7 +65,7 @@ namespace PVPArena
                         "On",
                         "Off"
                     },
-                    Saver = opt => this.StandardBossLevel = opt == 1,
+                    Saver = opt => this.StandardBossLevel = opt == 0,
                     Loader = () => this.StandardBossLevel ? 0 : 1
                 },
                 new IMenuMod.MenuEntry {
