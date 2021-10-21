@@ -56,7 +56,7 @@ namespace PVPArena
                         "On"
                     },
                     Saver = opt => this.BossEnabled = opt == 1,
-                    Loader = () => this.BossEnabled ? 0 : 1
+                    Loader = () => this.BossEnabled ? 1 : 0
                 },
                 new IMenuMod.MenuEntry {
                     Name = "Force Boss Level",
@@ -65,8 +65,8 @@ namespace PVPArena
                         "On",
                         "Off"
                     },
-                    Saver = opt => this.StandardBossLevel = opt == 0,
-                    Loader = () => this.StandardBossLevel ? 0 : 1
+                    Saver = opt => this.StandardBossLevel = opt == 1,
+                    Loader = () => this.StandardBossLevel ? 1 : 0
                 },
                 new IMenuMod.MenuEntry {
                     Name = "Boss Level",
