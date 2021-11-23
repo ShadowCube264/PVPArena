@@ -7,7 +7,7 @@ namespace PVPArena
     {
         private void Start()
         {
-            BossSceneController.Instance.BossLevel = PVPArena.Instance.BossLevel;
+            BossSceneController.Instance.BossLevel = PVPArena.settings.BossLevel;
         }
     }
 }

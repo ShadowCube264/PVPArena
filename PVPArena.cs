@@ -8,12 +8,12 @@ using System.Collections.Generic;
 
 namespace PVPArena
 {
-    public class PVPArena : Mod, IMenuMod, ITogglableMod
+    public class PVPArena : Mod, IMenuMod, ITogglableMod, IGlobalSettings<ArenaSettings>
     {
 
-        public bool BossEnabled;
-        public bool StandardBossLevel;
-        public int BossLevel;
+        public static ArenaSettings settings { get; set; } = new ArenaSettings();
+        public void OnLoadGlobal(ArenaSettings s) => settings = s;
+        public ArenaSettings OnSaveGlobal() => settings;
 
         public bool ToggleButtonInsideMenu => true;
 
@@ -55,8 +55,8 @@ namespace PVPArena
                         "Off",
                         "On"
                     },
-                    Saver = opt => this.BossEnabled = opt == 1,
-                    Loader = () => this.BossEnabled ? 1 : 0
+                    Saver = opt => settings.BossEnabled = opt == 1,
+                    Loader = () => settings.BossEnabled ? 1 : 0
                 },
                 new IMenuMod.MenuEntry {
                     Name = "Force Boss Level",
@@ -65,8 +65,8 @@ namespace PVPArena
                         "On",
                         "Off"
                     },
-                    Saver = opt => this.StandardBossLevel = opt == 1,
-                    Loader = () => this.StandardBossLevel ? 1 : 0
+                    Saver = opt => settings.StandardBossLevel = opt == 1,
+                    Loader = () => settings.StandardBossLevel ? 1 : 0
                 },
                 new IMenuMod.MenuEntry {
                     Name = "Boss Level",
@@ -76,8 +76,8 @@ namespace PVPArena
                         "Ascended",
                         "Radiant"
                     },
-                    Saver = opt => this.BossLevel = opt,
-                    Loader = () => this.BossLevel
+                    Saver = opt => settings.BossLevel = opt,
+                    Loader = () => settings.BossLevel
                 }
             };
         }
@@ -94,11 +94,11 @@ namespace PVPArena
 
         private void AddComponent()
         {
-            if (this.StandardBossLevel == false)
+            if (settings.StandardBossLevel == false)
             {
                 GameManager.instance.gameObject.AddComponent<SceneLogicLevel>();
             }
-            if (this.BossEnabled == true)
+            if (settings.BossEnabled == true)
             {
                 GameManager.instance.gameObject.AddComponent<SceneLogicBoss>();
             }
@@ -129,5 +129,12 @@ namespace PVPArena
             if (finder3 != null)
                 UObject.Destroy(finder3);
         }
+    }
+
+    public class ArenaSettings
+    {
+        public bool BossEnabled = false;
+        public bool StandardBossLevel = false;
+        public int BossLevel = 0;
     }
 }
